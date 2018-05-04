@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">tweets</string>
+    <string name="action_Search">search</string>
+</resources>
