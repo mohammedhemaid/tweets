@@ -4,8 +4,9 @@ import android.net.Uri;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.android.volley.Request;
@@ -24,8 +25,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<tweets> tweetsList = new ArrayList<>();
-    private ListView listView;
-    private tweetAdapter madapter;
+    private tweetAdapter mAdapter;
     private ProgressBar pb_Loading;
 
     @Override
@@ -34,9 +34,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         pb_Loading = findViewById(R.id.pb_loading);
         pb_Loading.setVisibility(View.VISIBLE);
-        listView = findViewById(R.id.list);
-        madapter = new tweetAdapter(MainActivity.this, tweetsList);
-        listView.setAdapter(madapter);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        mAdapter = new tweetAdapter(this,tweetsList);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         gettweets();
     }
@@ -67,13 +68,12 @@ public class MainActivity extends AppCompatActivity {
                         String screen_name = user.getString("screen_name");
                         String photo = user.getString("profile_image_url_https");
 
-
                         Uri image = Uri.parse(photo);
 
                         tweets tw = new tweets(image, name, "@" + screen_name, tweetText, date);
 
                         tweetsList.add(tw);
-                        madapter.notifyDataSetChanged();
+                        mAdapter.notifyDataSetChanged();
                         pb_Loading.setVisibility(View.GONE);
                     }
 
