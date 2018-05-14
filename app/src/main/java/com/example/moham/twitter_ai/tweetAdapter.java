@@ -90,5 +90,8 @@ public class tweetAdapter extends RecyclerView.Adapter<tweetAdapter.TweetViewHol
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         return timeFormat.format(dateObject);
     }
+    public void setCardInfoList(List<tweets> tweet){
+        this.mTweets = tweet;
+    }
     }
 
