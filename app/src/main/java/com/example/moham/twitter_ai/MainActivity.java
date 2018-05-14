@@ -2,6 +2,7 @@ package com.example.moham.twitter_ai;
 
 import android.net.Uri;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,18 +10,28 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-
 import java.util.ArrayList;
+import java.util.List;
+
+import twitter4j.MediaEntity;
+import twitter4j.Paging;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,64 +46,61 @@ public class MainActivity extends AppCompatActivity {
         pb_Loading = findViewById(R.id.pb_loading);
         pb_Loading.setVisibility(View.VISIBLE);
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        mAdapter = new tweetAdapter(this,tweetsList);
+        mAdapter = new tweetAdapter(this, tweetsList);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        gettweets();
+        new TweetsAsyncTask().execute();
     }
 
-    void gettweets() {
+        void gettweets () throws TwitterException {
 
-        String url = "https://mohammedhemaid.000webhostapp.com/jsonTest.json";
+            ConfigurationBuilder cb = new ConfigurationBuilder();
+            cb.setDebugEnabled(true);
+            cb.setOAuthConsumerKey("6PP9Qhwz81mXl00IZu9fxsXmm");
+            cb.setOAuthConsumerSecret("Ww8lzNjk4UQRxKzMip3Bk5qVnZgbnv0iZ2UzOnGFkfSKWEXczh");
+            cb.setOAuthAccessToken("3417793145-YsaGPrvzAaAfuu06Kc4nMI1mBA5kY6C0bWPsPYc");
+            cb.setOAuthAccessTokenSecret("S0tbuqLeP8uRiDXsOfBtJxZlrCwVufsRPrVClrBRghfa0");
 
-        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+            final Paging paging = new Paging();
+            paging.count(200);
+            List<Status> status = twitter.getHomeTimeline(paging);
+            for (Status s : status) {
+                    Uri profileImage = Uri.parse(s.getUser().getProfileImageURL());
+                    tweets tw =
+                            new tweets(profileImage,
+                                    s.getUser().getName(),
+                                    "@" + s.getUser().getScreenName(),
+                                    s.getText(), s.getCreatedAt().getTime());
 
+                    tweetsList.add(tw);
 
-            @Override
-            public void onResponse(String response) {
-
-                try {
-
-                    JSONObject object = new JSONObject(response);
-
-                    JSONArray array = object.getJSONArray("tweets");
-
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject currentobject = array.getJSONObject(i);
-                        String tweetText = currentobject.getString("text");
-                        long date = currentobject.getLong("timestamp_ms");
-
-                        JSONObject user = currentobject.getJSONObject("user");
-                        String name = user.getString("name");
-                        String screen_name = user.getString("screen_name");
-                        String photo = user.getString("profile_image_url_https");
-
-                        Uri image = Uri.parse(photo);
-
-                        tweets tw = new tweets(image, name, "@" + screen_name, tweetText, date);
-
-                        tweetsList.add(tw);
-                        mAdapter.notifyDataSetChanged();
-                        pb_Loading.setVisibility(View.GONE);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
 
-
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-        Volley.newRequestQueue(this).add(postRequest);
+
+      private class TweetsAsyncTask extends AsyncTask<Void,Void,Void>{
+
+          @Override
+          protected Void doInBackground(Void... voids) {
+              try {
+                  gettweets();
+              }catch (TwitterException e){
+                  e.printStackTrace();
+              }
+              return null;
+          }
+
+          @Override
+          protected void onPostExecute(Void aVoid) {
+              mAdapter.notifyDataSetChanged();
+              pb_Loading.setVisibility(View.GONE);
+          }
+      }
+
+
     }
 
-}
 
 

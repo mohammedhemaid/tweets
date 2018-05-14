@@ -13,8 +13,17 @@ public class tweets {
     String screenName;
     String tweet;
     long timeStamp;
+    Uri post_Image;
 
-    public tweets(Uri photo, String name, String screenName, String tweet, long timeStamp) {
+    public tweets(Uri photo, String name, String screenName, String tweet, long timeStamp ,Uri post_Image ) {
+        this.photo = photo;
+        this.name = name;
+        this.screenName = screenName;
+        this.tweet = tweet;
+        this.timeStamp = timeStamp;
+        this.post_Image = post_Image;
+    }
+    public tweets(Uri photo, String name, String screenName, String tweet, long timeStamp ) {
         this.photo = photo;
         this.name = name;
         this.screenName = screenName;
@@ -40,5 +49,9 @@ public class tweets {
 
     public Uri getPhoto() {
         return photo;
+    }
+
+    public Uri getPost_Image() {
+        return post_Image;
     }
 }

@@ -19,7 +19,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
@@ -29,4 +29,6 @@ dependencies {
     compile 'com.android.volley:volley:1.1.0'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation files('libs/twitter4j-core-4.0.4.jar')
+    implementation files('libs/twitter4j-stream-4.0.4.jar')
 }
